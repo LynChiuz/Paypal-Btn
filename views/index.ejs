@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Thanh toán với PayPal</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=AfKHKcwmkZyrptoRukoK0fkLVKfCV8mqIWOW7-DdVFy0-K1YPb4qSdBKgI_R8x7B2bOMoZWuLjDE6_iQ&currency=USD"></script>
+  </head>
+  <body>
+    <h1>Thanh toán với PayPal</h1>
+
+    <!-- Nút PayPal -->
+    <div id="paypal-button-container"></div>
+
+    <script>
+      paypal
+        .Buttons({
+          // Tạo đơn hàng khi người dùng nhấn nút
+          createOrder: async (data, actions) => {
+            const response = await axios.post("http://localhost:5000/order", {
+              orderItems: [
+                {
+                  quantity: 2,
+                  productVariantId: 1,
+                },
+              ],
+              merchantId: 1,
+              shippingInfo: {
+                country: "VN",
+                city: "Hà Nội",
+                zipCode: "000084",
+                address1: "Cầu Giấy, Hà Nội",
+                email: "haviethung0801@gmail.com",
+                name: "Hùng Hà Việt",
+                phone: "+84367948558",
+                province: "Hà Nội",
+              },
+              billingInfo: {
+                country: "VN",
+                city: "Hà Nội",
+                zipCode: "000084",
+                address1: "Cầu Giấy, Hà Nội",
+                email: "haviethung0801@gmail.com",
+                name: "Hùng Hà Việt",
+                phone: "+84367948558",
+                province: "Hà Nội",
+              },
+            });
+            console.log("order", response.data);
+            return response.data.orderPaypal.id; // Trả về orderId để thực hiện thanh toán
+          },
+          // Xác nhận thanh toán sau khi người dùng đồng ý
+          onApprove: async (data, actions) => {
+            console.log("data", data);
+            console.log("actions", actions);
+            try {
+              const res = await axios.post(
+                "http://localhost:5000/order/capture",
+                {
+                  paymentOrderId: data.orderID,
+                }
+              );
+              console.log("Thanh toán thanh cong", res.data);
+            } catch (error) {
+              console.log("Lỗi khi thanh toán", error);
+            }
+          },
+          // Xử lý lỗi
+          onError: (err) => {
+            alert("Đã xảy ra lỗi trong quá trình thanh toán.");
+            console.error(err);
+          },
+        })
+        .render("#paypal-button-container"); // Hiển thị nút PayPal trong div đã chỉ định
+    </script>
+  </body>
+</html>
