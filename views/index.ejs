@@ -14,65 +14,37 @@
     <div id="paypal-button-container"></div>
 
     <script>
-      let abc = []
+      let abc = [];
       paypal
         .Buttons({
           // Tạo đơn hàng khi người dùng nhấn nút
           createOrder: async (data, actions) => {
-            const response = await axios.post("http://localhost:4000/order/create-order", {
-
-              order: [
-                {
-                  merchantId: 48,
-                  variants: [
-                    {
-                      productVariantId: 3674,
-                      quantity: 2,
-                    },
-                    {
-                      productVariantId: 3675,
-                      quantity: 3,
-                    }
-                  ]
-                },
-                {
-                  merchantId: 41,
-                  variants: [
-                    {
-                      productVariantId: 3723,
-                      quantity: 4,
-                    },
-                    {
-                      productVariantId: 3724,
-                      quantity: 5,
-                    }
-                  ]
-                }
-              ],
-              // shippingInfo: {
-              //   country: "VN",
-              //   city: "Hà Nội",
-              //   zipCode: "000084",
-              //   address1: "Cầu Giấy, Hà Nội",
-              //   email: "haviethung0801@gmail.com",
-              //   name: "Hùng Hà Việt",
-              //   phone: "012345678",
-              //   province: "Hà Nội",
-              // },
-              billingInfo: {
-                country: "VN",
-                city: "Hà Nội",
-                zipCode: "000084",
-                address1: "Cầu Giấy, Hà Nội",
-                email: "haviethung0801@gmail.com",
-                name: "Hùng Hà Việt",
-                phone: "012345678",
-                province: "Hà Nội",
-              },
-            });
+            const response = await axios.post(
+              "http://localhost:4000/order/create-order",
+              {
+                order: [
+                  {
+                    merchantId: 41,
+                    variants: [
+                      {
+                        productVariantId: 3728,
+                        quantity: 1,
+                      },
+                      {
+                        productVariantId: 3726,
+                        quantity: 1,
+                      },
+                    ],
+                    note: "",
+                  },
+                ],
+              }
+            );
             console.log("order", response.data);
-            abc = response.data.paymentOrderId.purchase_units.map(item => item.reference_id)
-            console.log('abc', abc)
+            abc = response.data.paymentOrderId.purchase_units.map(
+              (item) => item.reference_id
+            );
+            console.log("abc", abc);
             return response.data.paymentOrderId.id; // Trả về orderId để thực hiện thanh toán
           },
           onShippingChange: async (data, actions) => {
@@ -85,56 +57,30 @@
               const res = await axios.post(
                 "http://localhost:4000/order/update-new-order",
                 {
+                  listReferenceIds: ["cb59b0d2-de11-4ddc-94b5-c57610f89dce"],
                   paymentOrderId: data.orderID,
-                  listReferenceIds: abc,
+                  shippingInfo: {
+                    country: "US",
+                    zipCode: "95131",
+                    province: "CA",
+                    city: "San Jose",
+                  },
                   order: [
-                {
-                  merchantId: 48,
-                  variants: [
                     {
-                      productVariantId: 3674,
-                      quantity: 2,
+                      merchantId: 41,
+                      variants: [
+                        {
+                          productVariantId: 3728,
+                          quantity: 1,
+                        },
+                        {
+                          productVariantId: 3726,
+                          quantity: 1,
+                        },
+                      ],
+                      note: "",
                     },
-                    {
-                      productVariantId: 3675,
-                      quantity: 3,
-                    }
-                  ]
-                },
-                {
-                  merchantId: 41,
-                  variants: [
-                    {
-                      productVariantId: 3723,
-                      quantity: 4,
-                    },
-                    {
-                      productVariantId: 3724,
-                      quantity: 5,
-                    }
-                  ]
-                }
-              ],
-              // shippingInfo: {
-              //   country: "VN",
-              //   city: "Hà Nội",
-              //   zipCode: "000084",
-              //   address1: "Cầu Giấy, Hà Nội",
-              //   email: "haviethung0801@gmail.com",
-              //   name: "Hùng Hà Việt",
-              //   phone: "012345678",
-              //   province: "Hà Nội",
-              // },
-              billingInfo: {
-                country: "VN",
-                city: "Hà Nội",
-                zipCode: "000084",
-                address1: "Cầu Giấy, Hà Nội",
-                email: "haviethung0801@gmail.com",
-                name: "Hùng Hà Việt",
-                phone: "012345678",
-                province: "Hà Nội",
-              },
+                  ],
                 }
               );
 
@@ -145,14 +91,6 @@
                 error
               );
             }
-
-
-
-
-
-
-
-
 
             //     // // Nhận lại giá trị mới sau khi tính toán lại chi phí
             //     // const updatedAmount = res.data.updatedAmount;
