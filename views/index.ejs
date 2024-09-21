@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Thanh toán với PayPal</title>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="https://www.paypal.com/sdk/js?client-id=AfKHKcwmkZyrptoRukoK0fkLVKfCV8mqIWOW7-DdVFy0-K1YPb4qSdBKgI_R8x7B2bOMoZWuLjDE6_iQ&currency=USD"></script>
+    <script src="https://www.paypal.com/sdk/js?client-id=ARpU1vaZPNaUF6iKGuDcfjH6cMseEPtZvX6RRRAJKkwqb0L9tBOUpvV_ZYb0W2jTW0w7c99onsNJWXp2&currency=USD"></script>
   </head>
   <body>
     <h1>Thanh toán với PayPal</h1>
@@ -14,28 +14,51 @@
     <div id="paypal-button-container"></div>
 
     <script>
+      let abc = []
       paypal
         .Buttons({
           // Tạo đơn hàng khi người dùng nhấn nút
           createOrder: async (data, actions) => {
-            const response = await axios.post("http://localhost:5000/order", {
-              orderItems: [
+            const response = await axios.post("http://localhost:4000/order/create-order", {
+
+              order: [
                 {
-                  quantity: 2,
-                  productVariantId: 1,
+                  merchantId: 48,
+                  variants: [
+                    {
+                      productVariantId: 3674,
+                      quantity: 2,
+                    },
+                    {
+                      productVariantId: 3675,
+                      quantity: 3,
+                    }
+                  ]
                 },
+                {
+                  merchantId: 41,
+                  variants: [
+                    {
+                      productVariantId: 3723,
+                      quantity: 4,
+                    },
+                    {
+                      productVariantId: 3724,
+                      quantity: 5,
+                    }
+                  ]
+                }
               ],
-              merchantId: 1,
-              shippingInfo: {
-                country: "VN",
-                city: "Hà Nội",
-                zipCode: "000084",
-                address1: "Cầu Giấy, Hà Nội",
-                email: "haviethung0801@gmail.com",
-                name: "Hùng Hà Việt",
-                phone: "012345678",
-                province: "Hà Nội",
-              },
+              // shippingInfo: {
+              //   country: "VN",
+              //   city: "Hà Nội",
+              //   zipCode: "000084",
+              //   address1: "Cầu Giấy, Hà Nội",
+              //   email: "haviethung0801@gmail.com",
+              //   name: "Hùng Hà Việt",
+              //   phone: "012345678",
+              //   province: "Hà Nội",
+              // },
               billingInfo: {
                 country: "VN",
                 city: "Hà Nội",
@@ -48,7 +71,120 @@
               },
             });
             console.log("order", response.data);
-            return response.data.orderPaypal.id; // Trả về orderId để thực hiện thanh toán
+            abc = response.data.paymentOrderId.purchase_units.map(item => item.reference_id)
+            console.log('abc', abc)
+            return response.data.paymentOrderId.id; // Trả về orderId để thực hiện thanh toán
+          },
+          onShippingChange: async (data, actions) => {
+            console.log("Data", data);
+            const newShippingAddress = data.shipping_address;
+            console.log("Địa chỉ giao hàng mới:", newShippingAddress);
+
+            // Gửi địa chỉ mới tới server của bạn để cập nhật chi phí vận chuyển hoặc tổng giá trị đơn hàng
+            try {
+              const res = await axios.post(
+                "http://localhost:4000/order/update-new-order",
+                {
+                  paymentOrderId: data.orderID,
+                  listReferenceIds: abc,
+                  order: [
+                {
+                  merchantId: 48,
+                  variants: [
+                    {
+                      productVariantId: 3674,
+                      quantity: 2,
+                    },
+                    {
+                      productVariantId: 3675,
+                      quantity: 3,
+                    }
+                  ]
+                },
+                {
+                  merchantId: 41,
+                  variants: [
+                    {
+                      productVariantId: 3723,
+                      quantity: 4,
+                    },
+                    {
+                      productVariantId: 3724,
+                      quantity: 5,
+                    }
+                  ]
+                }
+              ],
+              // shippingInfo: {
+              //   country: "VN",
+              //   city: "Hà Nội",
+              //   zipCode: "000084",
+              //   address1: "Cầu Giấy, Hà Nội",
+              //   email: "haviethung0801@gmail.com",
+              //   name: "Hùng Hà Việt",
+              //   phone: "012345678",
+              //   province: "Hà Nội",
+              // },
+              billingInfo: {
+                country: "VN",
+                city: "Hà Nội",
+                zipCode: "000084",
+                address1: "Cầu Giấy, Hà Nội",
+                email: "haviethung0801@gmail.com",
+                name: "Hùng Hà Việt",
+                phone: "012345678",
+                province: "Hà Nội",
+              },
+                }
+              );
+
+              console.log("res - order", res.data);
+            } catch (error) {
+              console.log(
+                "Lỗi khi cập nhật địa chỉ giao hàng và số tiền",
+                error
+              );
+            }
+
+
+
+
+
+
+
+
+
+            //     // // Nhận lại giá trị mới sau khi tính toán lại chi phí
+            //     // const updatedAmount = res.data.updatedAmount;
+            //     // console.log("Cập nhật giá trị đơn hàng mới:", updatedAmount);
+
+            //     // Cập nhật giá trị đơn hàng mới trên PayPal
+            //     return actions.order.patch([
+            //       {
+            //         op: "replace",
+            //         path: "/purchase_units/@reference_id=='default'/amount",
+            //         value: {
+            //           currency_code: "USD",
+            //           value: 200,
+            //           breakdown: {
+            //             item_total: {
+            //               currency_code: "USD",
+            //               value: 100,
+            //             },
+            //             shipping: {
+            //               currency_code: "USD",
+            //               value: 9,
+            //             },
+            //           },
+            //         },
+            //       },
+            //     ]);
+            //   } catch (error) {
+            //     console.log("Lỗi khi cập nhật địa chỉ giao hàng và số tiền", error);
+            //     return actions.reject();
+            //   }
+
+            //   return actions.resolve();
           },
           // Xác nhận thanh toán sau khi người dùng đồng ý
           onApprove: async (data, actions) => {
@@ -56,7 +192,7 @@
             console.log("actions", actions);
             try {
               const res = await axios.post(
-                "http://localhost:5000/order/capture",
+                "http://localhost:4000/order/capture",
                 {
                   paymentOrderId: data.orderID,
                 }
