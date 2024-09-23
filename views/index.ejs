@@ -24,24 +24,56 @@
               {
                 order: [
                   {
+                    merchantId: 4,
+                    variants: [
+                      {
+                        productVariantId: 86,
+                        quantity: 1,
+                      },
+                    ],
+                    note: "",
+                  },
+                  {
                     merchantId: 41,
                     variants: [
                       {
-                        productVariantId: 3728,
+                        productVariantId: 3691,
                         quantity: 1,
                       },
                       {
-                        productVariantId: 3726,
+                        productVariantId: 3690,
                         quantity: 1,
                       },
                     ],
                     note: "",
                   },
                 ],
+                shippingInfo: {
+                  country: "VN",
+                  city: "Ha Noi",
+                  zipCode: "10000",
+                  address1: "Ha Noi",
+                  address2: "",
+                  email: "tiennab1711@gmail.com",
+                  name: "Anh Tien Nguyen",
+                  phone: "84364578458",
+                  province: "Hanoi City",
+                },
+                billingInfo: {
+                  country: "VN",
+                  city: "Ha Noi",
+                  zipCode: "10000",
+                  address1: "Ha Noi",
+                  address2: "",
+                  email: "tiennab1711@gmail.com",
+                  name: "Anh Tien Nguyen",
+                  phone: "+84364578458",
+                  province: "Hanoi City",
+                },
               }
             );
             console.log("order", response.data);
-            abc = response.data.orderInfo.referenceListIds
+            abc = response.data.orderInfo.referenceListIds;
             console.log("abc", abc);
             return response.data.orderInfo.id; // Trả về orderId để thực hiện thanh toán
           },
