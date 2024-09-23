@@ -41,11 +41,9 @@
               }
             );
             console.log("order", response.data);
-            abc = response.data.paymentOrderId.purchase_units.map(
-              (item) => item.reference_id
-            );
+            abc = response.data.orderInfo.referenceListIds
             console.log("abc", abc);
-            return response.data.paymentOrderId.id; // Trả về orderId để thực hiện thanh toán
+            return response.data.orderInfo.id; // Trả về orderId để thực hiện thanh toán
           },
           onShippingChange: async (data, actions) => {
             console.log("Data", data);
