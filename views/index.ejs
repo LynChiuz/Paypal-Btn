@@ -14,62 +14,28 @@
     <div id="paypal-button-container"></div>
 
     <script>
+      const port = 4000;
       let abc = [];
       paypal
         .Buttons({
           // Tạo đơn hàng khi người dùng nhấn nút
           createOrder: async (data, actions) => {
             const response = await axios.post(
-              "http://localhost:4000/order/create-order",
+              `http://localhost:${port}/order/create-order`,
               {
                 order: [
-                  {
-                    merchantId: 4,
-                    variants: [
-                      {
-                        productVariantId: 86,
-                        quantity: 1,
-                      },
-                    ],
-                    note: "",
-                  },
                   {
                     merchantId: 41,
                     variants: [
                       {
-                        productVariantId: 3691,
-                        quantity: 1,
-                      },
-                      {
-                        productVariantId: 3690,
+                        productVariantId: 3811,
                         quantity: 1,
                       },
                     ],
                     note: "",
                   },
                 ],
-                shippingInfo: {
-                  country: "VN",
-                  city: "Ha Noi",
-                  zipCode: "10000",
-                  address1: "Ha Noi",
-                  address2: "",
-                  email: "tiennab1711@gmail.com",
-                  name: "Anh Tien Nguyen",
-                  phone: "84364578458",
-                  province: "Hanoi City",
-                },
-                billingInfo: {
-                  country: "VN",
-                  city: "Ha Noi",
-                  zipCode: "10000",
-                  address1: "Ha Noi",
-                  address2: "",
-                  email: "tiennab1711@gmail.com",
-                  name: "Anh Tien Nguyen",
-                  phone: "+84364578458",
-                  province: "Hanoi City",
-                },
+                affiliateCode: "ipcDVyHwnexlIkn_zjdNP",
               }
             );
             console.log("order", response.data);
@@ -85,9 +51,9 @@
             // Gửi địa chỉ mới tới server của bạn để cập nhật chi phí vận chuyển hoặc tổng giá trị đơn hàng
             try {
               const res = await axios.post(
-                "http://localhost:4000/order/update-new-order",
+                `http://localhost:${port}/order/update-new-order`,
                 {
-                  listReferenceIds: ["cb59b0d2-de11-4ddc-94b5-c57610f89dce"],
+                  listReferenceIds: abc,
                   paymentOrderId: data.orderID,
                   shippingInfo: {
                     country: "US",
@@ -160,7 +126,7 @@
             console.log("actions", actions);
             try {
               const res = await axios.post(
-                "http://localhost:4000/order/capture",
+                `http://localhost:${port}/order/capture`,
                 {
                   paymentOrderId: data.orderID,
                 }
